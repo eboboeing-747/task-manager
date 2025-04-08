@@ -1,0 +1,40 @@
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "id": null,
+    "name": "name1",
+    "password": "password0"
+}
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "id": null,
+    "name": "name1",
+    "password": "password0"
+}
+
+###
+POST http://localhost:3000/tasks/create
+Content-Type: application/json
+
+{
+    "id": null,
+    "userId": 0,
+    "title": "title1",
+    "contents": "user 1 bruh",
+    "deadline": "will-think-later",
+    "tagIds": [],
+    "statusId": null
+}
+
+###
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+    "userId": 0
+}
