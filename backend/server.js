@@ -36,6 +36,7 @@ class Task {
         this.deadline = task.deadline;
         this.tagIds = [];
         this.statusId = task.statusId;
+        this.dateTime = new Date(task.dateTime);
     }
 }
 
@@ -143,6 +144,30 @@ app.post('/statuses', (req, res) => {
     })
 
     return res.status(200).send(statusList);
+})
+
+app.post('tags/create', (req, res) => {
+    if (!users.contents.has(req.body.userId)) {
+        return res.status(404).send({'error': 'no user with such id'});
+    }
+
+    let tag = new Tag(req.body);
+    tags.add(tag);
+
+    return res.status(201).end();
+})
+
+app.post('tags', (req, res) => {
+    let userId = req.body.userId;
+    let tagList = [];
+
+    tags.contents.forEach(function(value, key) {
+        if (value.userId == userId) {
+            tagList.push(value);
+        }
+    })
+
+    return res.status(200).send(tagList);
 })
 
 app.listen(process.env.PORT);
