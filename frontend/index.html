@@ -14,23 +14,36 @@
 </header>
 
 <main>
-    <div class="calendar-wrapper">
-        <button id="scroll-left">left</button>
-        <div style="width: 100%;">
-            <div class="calendar-header">
-                <div class="header-day">monday</div>
-                <div class="header-day">tuesday</div>
-                <div class="header-day">wendnesday</div>
-                <div class="header-day">thursday</div>
-                <div class="header-day">friday</div>
-                <div class="header-day">saturday</div>
-                <div class="header-day">sunday</div>
-            </div>
-            <div class="calendar" id="calendar">
+    <div class="page-wrapper">
 
+        <div class="calendar-wrapper">
+            <button class="scroll-button" id="scroll-left">
+                <div class="scroll-button-icon">&lt;</div>
+            </button>
+
+            <div class="calender">
+                <div class="focus-month" id="focus-month-display">
+
+                </div>
+                <div class="calendar-header">
+                    <div class="header-day">monday</div>
+                    <div class="header-day">tuesday</div>
+                    <div class="header-day">wendnesday</div>
+                    <div class="header-day">thursday</div>
+                    <div class="header-day">friday</div>
+                    <div class="header-day">saturday</div>
+                    <div class="header-day">sunday</div>
+                </div>
+                <div class="calendar-main" id="calendar-main">
+
+                </div>
             </div>
+
+            <button class="scroll-button" id="scroll-right">
+                <div class="scroll-button-icon">&gt;</div>
+            </button>
         </div>
-        <button id="scroll-right">right</button>
+
     </div>
 </main>
 

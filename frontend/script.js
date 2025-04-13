@@ -1,5 +1,7 @@
-const calendar = document.getElementById('calendar');
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'feb'];
+const calendar = document.getElementById('calendar-main');
 const currentDate = new Date();
+const focusMonthDisplay = document.getElementById('focus-month-display');
 let focusYear = currentDate.getFullYear();
 let focusMonth = currentDate.getMonth();
 const scrollLeftButton = document.getElementById('scroll-left');
@@ -73,6 +75,8 @@ function fillCalendar(year, month) {
         let currentDay = document.getElementById(currentDayId);
         currentDay.classList.add('current');
     }
+
+    focusMonthDisplay.innerText = `${MONTHS[focusMonth]}, ${focusYear}`;
 }
 
 function scrollLeft() {
@@ -96,3 +100,10 @@ function scrollRight() {
 }
 
 fillCalendar(focusYear, focusMonth);
+
+window.addEventListener("keypress", (event) => {
+    if (event.key == 'h')
+        scrollRight();
+    else if (event.key == 'l')
+        scrollLeft();
+});

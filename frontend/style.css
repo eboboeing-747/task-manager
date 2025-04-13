@@ -1,6 +1,7 @@
 :root {
     --bg: #111111;
     --text: white;
+    --active: grey;
 }
 
 html {
@@ -13,9 +14,61 @@ header {
     top: 0;
 }
 
+.page-wrapper {
+    height: 100vh;
+    width: 100vw;
+}
+
+.scroll-button {
+    background-color: transparent;
+    border-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 8px;
+}
+
+.scroll-button:hover .scroll-button-icon {
+    background-color: var(--text);
+    color: var(--bg);
+}
+
+.scroll-button:active .scroll-button-icon {
+    background-color: inherit;
+    color: var(--text);
+}
+
+.scroll-button:active {
+    background-color: var(--active);
+}
+
+.scroll-button-icon {
+    background-color: transparent;
+    color: var(--text);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .calendar-wrapper {
+    height: 90%;
     display: flex;
     flex-direction: row;
+}
+
+.calender {
+    width: 100%;
+    height: 90%;
+}
+
+.focus-month {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .calendar-header {
@@ -23,9 +76,8 @@ header {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
-.calendar {
+.calendar-main {
     display: grid;
-    height: 90vh;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
