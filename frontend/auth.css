@@ -1,0 +1,82 @@
+@import url('./style.css');
+
+:root {
+    --selected: rgba(0, 0, 0, 0.5);
+}
+
+html {
+    font-size: 20px;
+}
+
+.auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    background-color: var(--selected);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.auth-type-selector {
+    display: flex;
+    flex-direction: row;
+}
+
+.auth-type-selector-button {
+    margin-top: 30vh;
+    background-color: var(--bg);
+    border: none;
+    border-radius: 16px;
+    color: var(--text);
+    padding: 10px 20px 10px 20px;
+    font-size: 20px;
+}
+
+.auth-type-selector-button:hover {
+    background-color: var(--text);
+    color: var(--bg);
+}
+
+.selected-button {
+    border-radius: 16px 16px 0px 0px;
+    background-color: var(--selected);
+}
+
+.auth-form-unit {
+    background-color: var(--bg);
+    color: var(--text);
+    border: none;
+    font-size: 20px;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px
+}
+
+.auth-form-text {
+    font-size: 20px;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 10px 10px 20px;
+}
+
+.submit-button {
+    border: none;
+    font-size: 20px;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 10px 10px 20px;
+    background-color: var(--text);
+    color: var(--bg);
+}
+
+.submit-button:hover {
+    background-color: var(--bg);
+    color: var(--text);
+}

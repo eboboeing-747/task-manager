@@ -1,25 +1,28 @@
-const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'feb'];
-const calendar = document.getElementById('calendar-main');
+let userId = null;
+let userPassword = null;
+
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const currentDate = new Date();
-const focusMonthDisplay = document.getElementById('focus-month-display');
 let focusYear = currentDate.getFullYear();
 let focusMonth = currentDate.getMonth();
+
+const calendarMain = document.getElementById('calendar-main');
+const focusMonthDisplay = document.getElementById('focus-month-display');
+const taskView = document.getElementById('tasks-view');
+
 const scrollLeftButton = document.getElementById('scroll-left');
 const scrollRightButton = document.getElementById('scroll-right');
+const locateCurrentMonthButton = document.getElementById('locate-current-month');
+
 scrollLeftButton.addEventListener('click', scrollLeft, true);
 scrollRightButton.addEventListener('click', scrollRight, true);
+locateCurrentMonthButton.addEventListener('click', locateCurrentMonth, true);
 
-/*
-class Day {
-    constructor(monthDay) {
-        this.day = document.createElement('div');
-        this.day.classList.add('day');
-        this.day.innerText = monthDay;
 
-        calendar.appendChild(day);
-    }
+
+function locateCurrentMonth() {
+    fillCalendar(currentDate.getFullYear(), currentDate.getMonth());
 }
-*/
 
 function createDay(year, month, day, isOffset=false) {
     let cell = document.createElement('div');
@@ -30,7 +33,7 @@ function createDay(year, month, day, isOffset=false) {
         cell.classList.add('offset');
 
     cell.innerText = day;
-    calendar.appendChild(cell);
+    calendarMain.appendChild(cell);
 }
 
 function getDaysAmount(year, month) {
@@ -46,7 +49,7 @@ function getOffset(date) {
 }
 
 function fillCalendar(year, month) {
-    calendar.replaceChildren();
+    calendarMain.replaceChildren();
     let monthToFill = new Date(year, month, 1);
     daysAmount = new Date(monthToFill.getFullYear(), monthToFill.getMonth() + 1, 0).getDate();
     let upperBorder = 0;
@@ -80,18 +83,21 @@ function fillCalendar(year, month) {
 }
 
 function scrollLeft() {
-    if (focusMonth < 1)
+    if (focusMonth < 1) {
         focusYear--;
+        focusMonth = 11;
+    }
     else
         focusMonth--;
-
 
     fillCalendar(focusYear, focusMonth);
 }
 
 function scrollRight() {
-    if (focusMonth > 11)
+    if (focusMonth > 10) {
+        focusMonth = 0;
         focusYear++;
+    }
     else
         focusMonth++;
 
@@ -101,9 +107,17 @@ function scrollRight() {
 
 fillCalendar(focusYear, focusMonth);
 
-window.addEventListener("keypress", (event) => {
+window.addEventListener('keypress', (event) => {
     if (event.key == 'h')
-        scrollRight();
-    else if (event.key == 'l')
         scrollLeft();
+    else if (event.key == 'l')
+        scrollRight();
 });
+
+function main() {
+    if (userId == null) {
+        window.location.href = "./auth.html";
+    }
+}
+
+main();

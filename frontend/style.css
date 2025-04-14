@@ -9,14 +9,27 @@ html {
     color: var(--text);
 }
 
+body {
+    height: 100vh;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+main {
+    height: 96%;
+}
+
 header {
     position: sticky;
     top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4%;
 }
 
 .page-wrapper {
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
 }
 
 .scroll-button {
@@ -55,28 +68,31 @@ header {
 }
 
 .calendar-wrapper {
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: row;
 }
 
-.calender {
-    width: 100%;
-    height: 90%;
+.calendar {
+    width: 50%;
 }
 
 .focus-month {
+    height: 4%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .calendar-header {
+    height: 2%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    align-items: center;
 }
 
 .calendar-main {
+    height: 96%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -90,6 +106,7 @@ header {
     text-align: center;
     margin: 8px;
     border: 3px solid white;
+    border-radius: 8px;
 }
 
 .day:hover {
@@ -105,4 +122,8 @@ header {
 
 .current {
     border-color: red;
+}
+
+.tasks-view {
+    width: 50%;
 }

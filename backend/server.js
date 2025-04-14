@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 class Container {
     constructor () {
@@ -80,7 +85,11 @@ app.post('/register', (req, res) => {
 
     let user = new User(req.body);
     users.add(user);
-    return res.status(201).end();
+    return res.status(201).send({
+        'id': user.id,
+        'name': user.name,
+        'password': null
+    });
 })
 
 app.post('/login', (req, res) => {
@@ -94,8 +103,11 @@ app.post('/login', (req, res) => {
         return res.status(401).send({'error': 'incorrect password'});
     }
 
-    user.password = null;
-    return res.status(200).send(user);
+    return res.status(200).send({
+        'id': user.id,
+        'name': user.name,
+        'password': null
+    });
 })
 
 app.post('/tasks/create', (req, res) => {

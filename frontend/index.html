@@ -3,47 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>calendar</title>
     <link rel="stylesheet" href="./style.css"/>
     <script defer src="./script.js"></script>
 </head>
 <body>
 
 <header>
-
+    <div class="focus-month" id="focus-month-display"></div>
+    <button id="locate-current-month">back to current month</button>
 </header>
 
 <main>
-    <div class="page-wrapper">
+    <div class="calendar-wrapper">
+        <button class="scroll-button" id="scroll-left">
+            <div class="scroll-button-icon">&lt;</div>
+        </button>
 
-        <div class="calendar-wrapper">
-            <button class="scroll-button" id="scroll-left">
-                <div class="scroll-button-icon">&lt;</div>
-            </button>
-
-            <div class="calender">
-                <div class="focus-month" id="focus-month-display">
-
-                </div>
-                <div class="calendar-header">
-                    <div class="header-day">monday</div>
-                    <div class="header-day">tuesday</div>
-                    <div class="header-day">wendnesday</div>
-                    <div class="header-day">thursday</div>
-                    <div class="header-day">friday</div>
-                    <div class="header-day">saturday</div>
-                    <div class="header-day">sunday</div>
-                </div>
-                <div class="calendar-main" id="calendar-main">
-
-                </div>
+        <div class="calendar">
+            <div class="calendar-header">
+                <div class="header-day">monday</div>
+                <div class="header-day">tuesday</div>
+                <div class="header-day">wendnesday</div>
+                <div class="header-day">thursday</div>
+                <div class="header-day">friday</div>
+                <div class="header-day">saturday</div>
+                <div class="header-day">sunday</div>
             </div>
-
-            <button class="scroll-button" id="scroll-right">
-                <div class="scroll-button-icon">&gt;</div>
-            </button>
+            <div class="calendar-main" id="calendar-main"></div>
         </div>
 
+        <button class="scroll-button" id="scroll-right">
+            <div class="scroll-button-icon">&gt;</div>
+        </button>
+
+        <div class="tasks-view" id="tasks-view"></div>
     </div>
 </main>
 

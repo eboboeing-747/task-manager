@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>auth</title>
+    <link rel="stylesheet" href="./style.css"/>
+    <link rel="stylesheet" href="./auth.css"/>
+    <script defer src="./auth.js"></script>
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <div class="auth-type-selector">
+        <button class="auth-type-selector-button" id="login-button">login</button>
+        <button class="auth-type-selector-button" id="register-button">register</button>
+    </div>
+
+    <form class="auth-form" id="login-form">
+        <label for="username" class="auth-form-text">username:</label>
+        <input class="auth-form-unit" type="text" name="username" id="login-username" required>
+
+        <label for="password" id="password" class="auth-form-text">password:</label>
+        <input class="auth-form-unit" type="password" name="password" id="login-password" required>
+
+        <button type="submit" class="submit-button" id="login-submit-button">login</button>
+        <button type="reset" class="auth-form-unit">reset</button>
+    </form>
+
+    <form class="auth-form" id="register-form">
+        <label for="username" class="auth-form-text">username:</label>
+        <input class="auth-form-unit" type="text" name="username" id="register-username" required>
+
+        <label for="password" id="password" class="auth-form-text">password:</label>
+        <input class="auth-form-unit" type="password" name="password" id="register-password" required>
+
+        <label for="verify-password" id="verify-password" class="auth-form-text">verify password:</label>
+        <input class="auth-form-unit" type="password" name="verify-password" id="verify-password" required>
+        
+        <button type="submit" class="submit-button" id="register-submit-button">register</button>
+        <button type="reset" class="auth-form-unit">reset</button>
+    </form>
+</div>
+
+</body>
+</html>
