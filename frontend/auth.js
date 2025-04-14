@@ -7,6 +7,8 @@ registerButton.addEventListener('click', selectRegisterForm, true);
 // loginSubmitButton.addEventListener('click', login, true);
 // registerSubmitButton.addEventListener('click', register, true);
 
+const errorDisplay = document.getElementById('error-display');
+
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 
@@ -30,7 +32,7 @@ function selectRegisterForm() {
     loginButton.classList.remove('selected-button');
 }
 
-selectRegisterForm();
+selectLoginForm();
 
 function getData() {
     return {
@@ -41,8 +43,6 @@ function getData() {
 
 loginForm.addEventListener('submit', async (event) => {
     const formData = getData();
-    const username = formData.username;
-    const password = formData.password;
 
     const reqeustParams = {
         method: 'POST',
@@ -61,6 +61,40 @@ loginForm.addEventListener('submit', async (event) => {
             console.log(data);
         });
 
+    localStorage.setItem('userId', '0');
     // window.location.href = "./index.html"; // if request is ok
     event.preventDefault();
+})
+
+registerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = getData();
+    const verifyPassword = document.getElementById('verify-password').value;
+
+    if (verifyPassword != formData.password) {
+        console.log('passwords doesnt match');
+        errorDisplay.textContent = 'passwords doesnt match';
+        return;
+    }
+
+    const reqeustParams = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    }
+
+    /*
+    fetch('http://localhost:3000/register', requestParams)
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data);
+        });
+    */
+
+    // localStorage.setItem('userId', '0');
+    // window.location.href = "./index.html"; // if request is ok
 })

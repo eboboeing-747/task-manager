@@ -2,6 +2,7 @@
 
 :root {
     --selected: rgba(0, 0, 0, 0.5);
+    --error: red;
 }
 
 html {
@@ -9,10 +10,18 @@ html {
 }
 
 .auth-wrapper {
+    padding-top: 30vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.error-display {
+    height: 20px;
+    color: red;
+    font-size: 16px;
+    margin: 10px;
 }
 
 .auth-form {
@@ -30,7 +39,6 @@ html {
 }
 
 .auth-type-selector-button {
-    margin-top: 30vh;
     background-color: var(--bg);
     border: none;
     border-radius: 16px;

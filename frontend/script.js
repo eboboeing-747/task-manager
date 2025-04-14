@@ -1,5 +1,5 @@
-let userId = null;
-let userPassword = null;
+let userId = localStorage.getItem('userId')
+let userPassword = localStorage.getItem('userPassword');
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const currentDate = new Date();
@@ -32,7 +32,7 @@ function createDay(year, month, day, isOffset=false) {
     if (isOffset)
         cell.classList.add('offset');
 
-    cell.innerText = day;
+    cell.textContent = day;
     calendarMain.appendChild(cell);
 }
 
@@ -79,7 +79,7 @@ function fillCalendar(year, month) {
         currentDay.classList.add('current');
     }
 
-    focusMonthDisplay.innerText = `${MONTHS[focusMonth]}, ${focusYear}`;
+    focusMonthDisplay.textContent = `${MONTHS[month]}, ${year}`;
 }
 
 function scrollLeft() {
@@ -115,9 +115,13 @@ window.addEventListener('keypress', (event) => {
 });
 
 function main() {
-    if (userId == null) {
+    console.log(`${userId} === null\n${userId === null}\n${userPassword}\n${userPassword} === null`);
+
+    if (userId === null || userPassword === null) {
         window.location.href = "./auth.html";
     }
+
+
 }
 
 main();
