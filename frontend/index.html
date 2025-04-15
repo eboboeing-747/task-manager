@@ -12,6 +12,7 @@
 <header>
     <div class="focus-month" id="focus-month-display"></div>
     <button id="locate-current-month">back to current month</button>
+    <button id="create-task">new</button>
 </header>
 
 <main>
@@ -40,6 +41,25 @@
         <div class="tasks-view" id="tasks-view"></div>
     </div>
 </main>
+
+<div class="tasks-view" id="parent">
+    <div class="task-wrapper">
+        <div class="title-bar">
+            <input type="text" class="title">
+            <div>
+                <button>delete</button>
+                <button>save</button>
+            </div>
+        </div>
+        <textarea class="contents"></textarea>
+        <div class="tag-area">
+            <div>tag1</div>
+            <div>tag2</div>
+            <div>tag3</div>
+            <div>tag4</div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

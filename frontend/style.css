@@ -126,4 +126,40 @@ header {
 
 .tasks-view {
     width: 50%;
+    overflow: scroll;
+    scrollbar-width: none;
+}
+
+.task-wrapper {
+    display: none; /* apply flex js */
+    border: 1px solid white;
+    border-radius: 8px;
+    flex-direction: column;
+    padding: 10px;
+    margin: 8px;
+}
+
+.title-bar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.title {
+    font-size: 20px;
+    background-color: transparent;
+    color: var(--text);
+    border: none;
+}
+
+.contents {
+    font-size: 16px;
+    background-color: transparent;
+    color: var(--text);
+    border: none;
+    field-sizing: content;
+    resize: vertical;
+}
+
+.tag-area {
+    display: flex;
 }

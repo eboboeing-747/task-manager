@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
@@ -38,10 +38,9 @@ class Task {
         this.userId = task.userId;
         this.title = task.title;
         this.contents = task.contents;
-        this.deadline = task.deadline;
+        this.dateTime = new Date(task.deadline);
         this.tagIds = [];
         this.statusId = task.statusId;
-        this.dateTime = new Date(task.dateTime);
     }
 }
 
@@ -79,6 +78,8 @@ function resolveUsername(username) {
 }
 
 app.post('/register', (req, res) => {
+    console.log(req.body);
+
     if (resolveUsername(req.body.name) != null) {
         return res.status(400).send({'error': 'this username is already taken'});
     }
@@ -117,6 +118,7 @@ app.post('/tasks/create', (req, res) => {
 
     let task = new Task(req.body);
     tasks.add(task);
+    console.log(task);
 
     return res.status(201).end();
 })

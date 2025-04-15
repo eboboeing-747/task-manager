@@ -42,59 +42,71 @@ function getData() {
 }
 
 loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
     const formData = getData();
 
-    const reqeustParams = {
+    const requestParams = {
         method: 'POST',
+        mode: 'cors',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
     }
 
-    // let response = await fetch('http://127.0.0.1:3000/login', reqeustParams);
-    fetch('http://localhost:3000/login', reqeustParams)
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data);
-        });
+    const res = await fetch('http://localhost:3000/login', requestParams);
+    const body = await res.json();
 
-    localStorage.setItem('userId', '0');
-    // window.location.href = "./index.html"; // if request is ok
-    event.preventDefault();
+    if (!res.ok) {
+        errorDisplay.textContent = body.error;
+        return;
+    }
+    
+    localStorage.setItem('userId', body.id);
+    localStorage.setItem('userName', body.name);
+    localStorage.setItem('userPassword', formData.password);
+
+    window.location.href = "./index.html";
 })
 
 registerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const formData = getData();
-    const verifyPassword = document.getElementById('verify-password').value;
+    const verifyPassword = document.getElementById('register-verify-password').value;
 
     if (verifyPassword != formData.password) {
-        console.log('passwords doesnt match');
         errorDisplay.textContent = 'passwords doesnt match';
         return;
     }
 
-    const reqeustParams = {
+    const requestParams = {
         method: 'POST',
+        mode: 'cors',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
+        /*
+        body: {
+            'name': formData.name, 
+            'password': formData.password
+        }
+        */
     }
 
-    /*
-    fetch('http://localhost:3000/register', requestParams)
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data);
-        });
-    */
+    console.log(requestParams);
 
-    // localStorage.setItem('userId', '0');
-    // window.location.href = "./index.html"; // if request is ok
+    const res = await fetch('http://localhost:3000/register', requestParams);
+    const body = await res.json();
+
+    if (!res.ok) {
+        errorDisplay.textContent = body.error;
+        return;
+    }
+    
+    localStorage.setItem('userId', body.id);
+    localStorage.setItem('userName', body.name);
+    localStorage.setItem('userPassword', verifyPassword);
+
+    window.location.href = "./index.html";
 })

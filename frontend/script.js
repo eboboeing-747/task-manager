@@ -1,5 +1,7 @@
-let userId = localStorage.getItem('userId')
+let userName = localStorage.getItem('userName')
 let userPassword = localStorage.getItem('userPassword');
+
+let taskList = [];
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const currentDate = new Date();
@@ -13,10 +15,12 @@ const taskView = document.getElementById('tasks-view');
 const scrollLeftButton = document.getElementById('scroll-left');
 const scrollRightButton = document.getElementById('scroll-right');
 const locateCurrentMonthButton = document.getElementById('locate-current-month');
+const createTaskButton = document.getElementById('create-task');
 
 scrollLeftButton.addEventListener('click', scrollLeft, true);
 scrollRightButton.addEventListener('click', scrollRight, true);
 locateCurrentMonthButton.addEventListener('click', locateCurrentMonth, true);
+createTaskButton.addEventListener('click', () => {createTask('', '', [])}, true);
 
 
 
@@ -101,7 +105,6 @@ function scrollRight() {
     else
         focusMonth++;
 
-
     fillCalendar(focusYear, focusMonth);
 }
 
@@ -114,14 +117,58 @@ window.addEventListener('keypress', (event) => {
         scrollRight();
 });
 
-function main() {
-    console.log(`${userId} === null\n${userId === null}\n${userPassword}\n${userPassword} === null`);
+function createTask(titleText, contentsText, tagList) {
+    let tasksView = document.getElementById('tasks-view');
+    let taskTemplateParent = document.getElementById('parent');
+    let taskTemplate = taskTemplateParent.querySelector('.task-wrapper');
+    let taskClone = taskTemplate.cloneNode(true);
 
-    if (userId === null || userPassword === null) {
-        window.location.href = "./auth.html";
+    let title = taskClone.querySelector('.title');
+    title.value = titleText;
+    let contents = taskClone.querySelector('.contents');
+    contents.textContent = contentsText;
+
+    taskClone.style.display = 'flex';
+    tasksView.appendChild(taskClone);
+}
+
+async function main() {
+    if (userName === null || userPassword === null) {
+        window.location.href = './auth.html';
     }
 
+    let requestParams = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'name': userName,
+            'password': userPassword
+        })
+    }
 
+    const authRes = await fetch('http://localhost:3000/login', requestParams);
+
+    if (!authRes.ok) {
+        window.location.href = './auth.html';
+    }
+
+    const authBody = await authRes.json();
+    let userId = authBody.id;
+    localStorage.setItem('userId', userId);
+
+    requestParams.body = JSON.stringify({
+        'userId': userId
+    })
+
+    const taskRes = await fetch('http://localhost:3000/tasks', requestParams);
+    taskList = await taskRes.json();
+
+    for (let i = 0; i < taskList.length; i++) {
+        createTask(taskList[i].title, taskList[i].contents, []);
+    }
 }
 
 main();
