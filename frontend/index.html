@@ -42,16 +42,40 @@
     </div>
 </main>
 
+<div class="create-task-form-background" id="create-task-form-background">
+    <div class="create-task-form-wrapper" id="create-task-form-wrapper">
+        <div class="create-task-form-error-display" id="create-task-form-error-display"></div>
+        <form class="create-task-form" id="create-task-form">
+            <select id="create-task-form-status"></select>
+            <div class="title-bar">
+                <input type="text" class="title" id="create-task-form-title" required>
+                <div>
+                    <button id="cancel-form">cancel</button>
+                    <button type="submit">save</button>
+                </div>
+            </div>
+            <textarea class="create-task-form-contents" id="create-task-form-contents" required></textarea>
+            <div class="tag-area">
+                <div>tag1</div>
+                <div>tag2</div>
+                <div>tag3</div>
+                <div>tag4</div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="tasks-view" id="parent">
     <div class="task-wrapper">
+        <select class="status" id="template-status"></select>
         <div class="title-bar">
-            <input type="text" class="title">
+            <input type="text" class="title" id="template-title">
             <div>
-                <button>delete</button>
-                <button>save</button>
+                <button id="template-delete">delete</button>
+                <button id="template-save">save</button>
             </div>
         </div>
-        <textarea class="contents"></textarea>
+        <textarea class="contents" id="template-contents"></textarea>
         <div class="tag-area">
             <div>tag1</div>
             <div>tag2</div>

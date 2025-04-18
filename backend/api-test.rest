@@ -1,3 +1,4 @@
+### REGISTER NEW USER
 POST http://localhost:3000/register
 Content-Type: application/json
 
@@ -7,7 +8,7 @@ Content-Type: application/json
     "password": "password0"
 }
 
-###
+### LOGIN
 POST http://localhost:3000/login
 Content-Type: application/json
 
@@ -17,7 +18,15 @@ Content-Type: application/json
     "password": "password0"
 }
 
-###
+### GET ALL TASKS OF A USER
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+    "userId": 0
+}
+
+### CREATE TASK
 POST http://localhost:3000/tasks/create
 Content-Type: application/json
 
@@ -28,13 +37,55 @@ Content-Type: application/json
     "contents": "user 1 bruh",
     "deadline": "will-think-later",
     "tagIds": [],
-    "statusId": null
+    "statusId": 0
 }
 
-###
-POST http://localhost:3000/tasks
+### UPDATE TASK
+PUT http://localhost:3000/tasks/update
+Content-Type: application/json
+
+{
+    "id": 1,
+    "userId": 0,
+    "title": "updated second time",
+    "contents": "updated second time",
+    "deadline": "will-think-later",
+    "tagIds": [],
+    "statusId": 0
+}
+
+### DELETE TASK
+DELETE http://localhost:3000/tasks/delete
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+### GET ALL STATUSES OF A USER
+POST http://localhost:3000/statuses
 Content-Type: application/json
 
 {
     "userId": 0
+}
+
+### CREATE NEW STATUS
+POST http://localhost:3000/statuses/create
+Content-Type: application/json
+
+{
+    "userId": 0,
+    "name": "new",
+    "color": "green"
+}
+
+###
+POST http://localhost:3000/statuses/create
+Content-Type: application/json
+
+{
+    "userId": 0,
+    "name": "pending",
+    "color": "yellow"
 }

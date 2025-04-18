@@ -8,6 +8,7 @@ app.use(express.json());
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "*");
     next();
 });
 
@@ -46,6 +47,7 @@ class Task {
 
 class Status {
     constructor (status) {
+        this.userId = status.userId;
         this.name = status.name;
         this.color = status.color;
     }
@@ -111,6 +113,19 @@ app.post('/login', (req, res) => {
     });
 })
 
+app.post('/tasks', (req, res) => {
+    let userId = req.body.userId;
+    let taskList = [];
+
+    tasks.contents.forEach(function(value, key) {
+        if (value.userId == userId) {
+            taskList.push(value);
+        }
+    })
+
+    return res.status(200).send(taskList);
+})
+
 app.post('/tasks/create', (req, res) => {
     if (!users.contents.has(req.body.userId)) {
         return res.status(404).send({'error': 'no user with such id'});
@@ -123,17 +138,25 @@ app.post('/tasks/create', (req, res) => {
     return res.status(201).end();
 })
 
-app.post('/tasks', (req, res) => {
-    let userId = req.body.userId;
-    let taskList = [];
+app.put('/tasks/update', (req, res) => {
+    let id = req.body.id;
+    if (!tasks.contents.has(id)) {
+        return res.status(404).send({'error': 'no task with such id'});
+    }
 
-    tasks.contents.forEach(function(value, key) {
-        if (value.userId == userId) {
-            taskList.push(value);
-        }
-    })
+    tasks.contents.set(id, new Task(req.body));
+    return res.status(200).end();
+})
 
-    return res.status(200).send(taskList);
+app.delete('/tasks/delete', (req, res) => {
+    let id = req.body.id;
+
+    if (!tasks.contents.has(id)) {
+        return res.status(404).send({'error': 'no task with such id'});
+    }
+
+    tasks.contents.delete(id);
+    return res.status(200).end();
 })
 
 app.post('/statuses/create', (req, res) => {

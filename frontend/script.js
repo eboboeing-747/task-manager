@@ -1,7 +1,108 @@
-let userName = localStorage.getItem('userName')
-let userPassword = localStorage.getItem('userPassword');
+const tasksView = document.getElementById('tasks-view');
+
+class Task {
+    /*
+    * taskObject:
+    * id:         int
+    * userId:     int
+    * title:      string
+    * contents:   string
+    * dateTime:   Date
+    * tagIds:     array
+    * statusId:   int
+    */
+    constructor(taskObject) {
+        this.taskClone = this.cloneTask();
+
+        this.id = taskObject.id;
+
+        this.title = this.taskClone.querySelector('#template-title');
+        this.title.id = `title-${this.id}`;
+        this.title.value = taskObject.title;
+        this.contents = this.taskClone.querySelector('#template-contents');
+        this.contents.id = `contents-${this.id}`;
+        this.contents.textContent = taskObject.contents;
+        this.deleteTaskButton = this.taskClone.querySelector('#template-delete');
+        this.deleteTaskButton.id = `delete-${this.id}`;
+        this.deleteTaskButton.addEventListener('click', () => { this.delete(); }, true);
+        this.saveTaskButton = this.taskClone.querySelector('#template-save');
+        this.saveTaskButton.id = `delete-${this.id}`;
+        this.saveTaskButton.addEventListener('click', () => { this.save(); }, true);
+        this.statusSelector = this.taskClone.querySelector('#template-status');
+        this.statusSelector.id = `status-${this.id}`;
+        this.addStatusOptions();
+        this.statusSelector.selectedIndex = taskObject.statusId;
+
+        this.taskClone.style.display = 'flex';
+        tasksView.appendChild(this.taskClone);
+    }
+
+    cloneTask() {
+        let taskTemplateParent = document.getElementById('parent');
+        let taskTemplate = taskTemplateParent.querySelector('.task-wrapper');
+        let taskClone = taskTemplate.cloneNode(true);
+        return taskClone;
+    }
+
+    addStatusOptions() {
+        for (let i = 0; i < statusList.length; i++) {
+            let taskStatus = document.createElement('option');
+            taskStatus.textContent = statusList[i].name;
+            taskStatus.id = statusList[i].id;
+            this.statusSelector.appendChild(taskStatus);
+        }
+    }
+
+    async delete() {
+        let requestParams = {
+            method: 'DELETE',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'id': this.id
+            })
+        }
+
+        let res = await fetch('http://localhost:3000/tasks/delete', requestParams);
+        tasksView.removeChild(this.taskClone);
+    }
+
+    async save() {
+        let requestParams = {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.object())
+        }
+
+        let res = await fetch('http://localhost:3000/tasks/update', requestParams);
+    }
+
+    object() {
+        let status = this.statusSelector.options[this.statusSelector.selectedIndex];
+
+        return {
+            'id': this.id,
+            'userId': Number(userId),
+            'title': this.title.value,
+            'contents': this.contents.value,
+            'deadline': null, // tmp
+            'tagIds': [],
+            'statusId': Number(status.id)
+        }
+    }
+}
+
+const userName = localStorage.getItem('userName');
+const userPassword = localStorage.getItem('userPassword');
+const userId = localStorage.getItem('userId');
 
 let taskList = [];
+let statusList = ['new', 'pending', 'complete'];
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const currentDate = new Date();
@@ -11,18 +112,77 @@ let focusMonth = currentDate.getMonth();
 const calendarMain = document.getElementById('calendar-main');
 const focusMonthDisplay = document.getElementById('focus-month-display');
 const taskView = document.getElementById('tasks-view');
+const createTaskFormBackground = document.getElementById('create-task-form-background');
+const createTaskForm = document.getElementById('create-task-form');
+const createTaskFormWrapper = document.getElementById('create-task-form-wrapper');
+const createTaskFormStatusSelector = document.getElementById('create-task-form-status');
 
 const scrollLeftButton = document.getElementById('scroll-left');
 const scrollRightButton = document.getElementById('scroll-right');
 const locateCurrentMonthButton = document.getElementById('locate-current-month');
 const createTaskButton = document.getElementById('create-task');
+const cancelFormButton = document.getElementById('cancel-form');
 
 scrollLeftButton.addEventListener('click', scrollLeft, true);
 scrollRightButton.addEventListener('click', scrollRight, true);
 locateCurrentMonthButton.addEventListener('click', locateCurrentMonth, true);
-createTaskButton.addEventListener('click', () => {createTask('', '', [])}, true);
+createTaskButton.addEventListener('click', displayCreateTaskForm, true);
+createTaskFormBackground.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
+cancelFormButton.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
+
+createTaskForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const errorDisplay = document.getElementById('create-task-form-error-display');
+
+    let newTaskTitle = document.getElementById('create-task-form-title').value;
+    let newTaskContents = document.getElementById('create-task-form-contents').value;
+    let newTaskStatusSelector = document.getElementById('create-task-form-status');
+    let newTaskStatus = newTaskStatusSelector.options[newTaskStatusSelector.selectedIndex];
+
+    let requestParams = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'userId': Number(userId),
+            'title': newTaskTitle,
+            'contents': newTaskContents,
+            'deadline': null,
+            'tagIds': [],
+            'statusId': newTaskStatus.id
+        })
+    }
+
+    const res = await fetch('http://localhost:3000/tasks/create', requestParams);
+    
+    if (!res.ok) {
+        const body = await res.json();
+        errorDisplay.textContent = body.error;
+    }
+    
+    hideCreateTaskForm(null);
+    return;
+})
 
 
+
+function hideCreateTaskForm(event) {
+    if (event === null) {
+        createTaskFormBackground.style.display = 'none';
+        return;
+    }
+
+    if (!createTaskFormWrapper.contains(event.target)) {
+        createTaskFormBackground.style.display = 'none';
+    }
+}
+
+function displayCreateTaskForm() {
+    createTaskFormBackground.style.display = 'flex';
+}
 
 function locateCurrentMonth() {
     fillCalendar(currentDate.getFullYear(), currentDate.getMonth());
@@ -166,8 +326,18 @@ async function main() {
     const taskRes = await fetch('http://localhost:3000/tasks', requestParams);
     taskList = await taskRes.json();
 
+    const statusRes = await fetch('http://localhost:3000/statuses', requestParams);
+    statusList = await statusRes.json();
+
     for (let i = 0; i < taskList.length; i++) {
-        createTask(taskList[i].title, taskList[i].contents, []);
+        new Task(taskList[i]);
+    }
+
+    for (let i = 0; i < statusList.length; i++) {
+        let taskStatus = document.createElement('option');
+        taskStatus.textContent = statusList[i].name;
+        taskStatus.id = statusList[i].id;
+        createTaskFormStatusSelector.appendChild(taskStatus);
     }
 }
 
