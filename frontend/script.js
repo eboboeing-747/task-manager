@@ -1,3 +1,7 @@
+const userName = localStorage.getItem('userName');
+const userPassword = localStorage.getItem('userPassword');
+const userId = Number(localStorage.getItem('userId'));
+
 const tasksView = document.getElementById('tasks-view');
 
 class Task {
@@ -19,20 +23,28 @@ class Task {
         this.title = this.taskClone.querySelector('#template-title');
         this.title.id = `title-${this.id}`;
         this.title.value = taskObject.title;
+
         this.contents = this.taskClone.querySelector('#template-contents');
         this.contents.id = `contents-${this.id}`;
         this.contents.textContent = taskObject.contents;
+
         this.deleteTaskButton = this.taskClone.querySelector('#template-delete');
         this.deleteTaskButton.id = `delete-${this.id}`;
         this.deleteTaskButton.addEventListener('click', () => { this.delete(); }, true);
+
         this.saveTaskButton = this.taskClone.querySelector('#template-save');
         this.saveTaskButton.id = `delete-${this.id}`;
         this.saveTaskButton.addEventListener('click', () => { this.save(); }, true);
+
+        let status = resolveStatus(taskObject.statusId);
         this.statusSelector = this.taskClone.querySelector('#template-status');
         this.statusSelector.id = `status-${this.id}`;
         this.addStatusOptions();
-        this.statusSelector.selectedIndex = taskObject.statusId;
+        this.statusSelector.value = status.name;
+        this.taskClone.style.borderColor = status.color;
+
         this.dateSelector = this.taskClone.querySelector('#template-datetime');
+        this.dateSelector.id = `datetime-${this.id}`;
         this.dateSelector.valueAsNumber = taskObject.deadline ? taskObject.deadline : new Date();
 
         this.taskClone.style.display = 'flex';
@@ -90,7 +102,7 @@ class Task {
 
         return {
             'id': this.id,
-            'userId': Number(userId),
+            'userId': userId,
             'title': this.title.value,
             'contents': this.contents.value,
             'deadline': deadline,
@@ -99,10 +111,6 @@ class Task {
         }
     }
 }
-
-const userName = localStorage.getItem('userName');
-const userPassword = localStorage.getItem('userPassword');
-const userId = localStorage.getItem('userId');
 
 let taskList = [];
 let statusList = ['new', 'pending', 'complete'];
@@ -115,27 +123,67 @@ let focusMonth = currentDate.getMonth();
 const calendarMain = document.getElementById('calendar-main');
 const focusMonthDisplay = document.getElementById('focus-month-display');
 const taskView = document.getElementById('tasks-view');
+
 const createTaskFormBackground = document.getElementById('create-task-form-background');
 const createTaskForm = document.getElementById('create-task-form');
 const createTaskFormWrapper = document.getElementById('create-task-form-wrapper');
 const createTaskFormStatusSelector = document.getElementById('create-task-form-status');
 
+const createStatusForm = document.getElementById('create-status-form');
+const createStatusFormWrapper = document.getElementById('create-status-form-wrapper');
+const createStatusFormBackground = document.getElementById('create-status-form-background');
+
 const scrollLeftButton = document.getElementById('scroll-left');
 const scrollRightButton = document.getElementById('scroll-right');
 const locateCurrentMonthButton = document.getElementById('locate-current-month');
+const createStatusButton = document.getElementById('create-status');
 const createTaskButton = document.getElementById('create-task');
 const cancelFormButton = document.getElementById('cancel-form');
 
 scrollLeftButton.addEventListener('click', scrollLeft, true);
 scrollRightButton.addEventListener('click', scrollRight, true);
 locateCurrentMonthButton.addEventListener('click', locateCurrentMonth, true);
+createStatusButton.addEventListener('click', displayCreateStatusForm, true);
 createTaskButton.addEventListener('click', displayCreateTaskForm, true);
-createTaskFormBackground.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
-// cancelFormButton.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
+createStatusFormBackground.addEventListener('click', (event) => { hideForm(event, createStatusFormWrapper, createStatusFormBackground); }, true);
+createTaskFormBackground.addEventListener('click', (event) => { hideForm(event, createTaskFormWrapper, createTaskFormBackground); }, true);
+// cancelFormButton.addEventListener('click', (event) => { hideForm(event) }, true);
+
+createStatusForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const errorDisplay = document.getElementById('create-task-status-error-display');
+
+    let newStatusName = document.getElementById('create-status-form-name');
+    let newStatusColorPicker = document.getElementById('create-status-form-color-picker');
+
+    let requestParams = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'userId': userId,
+            'name': newStatusName.value,
+            'color': newStatusColorPicker.value
+        })
+    }
+
+    console.log(requestParams);
+
+    const res = await fetch('http://localhost:3000/statuses/create', requestParams);
+    
+    if (!res.ok) {
+        const body = await res.json();
+        errorDisplay.textContent = body.error;
+    }
+    
+    hideForm(null, createStatusFormWrapper, createStatusFormBackground);
+    return;
+});
 
 createTaskForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     const errorDisplay = document.getElementById('create-task-form-error-display');
 
     let newTaskTitle = document.getElementById('create-task-form-title').value;
@@ -151,7 +199,7 @@ createTaskForm.addEventListener('submit', async (event) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'userId': Number(userId),
+            'userId': userId,
             'title': newTaskTitle,
             'contents': newTaskContents,
             'deadline': newTaskDeadline,
@@ -167,21 +215,30 @@ createTaskForm.addEventListener('submit', async (event) => {
         errorDisplay.textContent = body.error;
     }
     
-    hideCreateTaskForm(null);
+    hideForm(null, createTaskFormWrapper, createTaskFormBackground);
     return;
 })
 
 
 
-function hideCreateTaskForm(event) {
+/* resolves statusId to status object */
+function resolveStatus(statusId) {
+    return statusList.find((elem) => elem.id == statusId);
+}
+
+function hideForm(event, formWrapper, formBackground) {
     if (event === null) {
-        createTaskFormBackground.style.display = 'none';
+        formBackground.style.display = 'none';
         return;
     }
 
-    if (!createTaskFormWrapper.contains(event.target)) {
-        createTaskFormBackground.style.display = 'none';
+    if (!formWrapper.contains(event.target)) {
+        formBackground.style.display = 'none';
     }
+}
+
+function displayCreateStatusForm() {
+    createStatusFormBackground.style.display = 'flex';
 }
 
 function displayCreateTaskForm() {
@@ -284,21 +341,6 @@ window.addEventListener('keypress', (event) => {
     else if (event.key == 'l')
         scrollRight();
 });
-
-function createTask(titleText, contentsText, tagList) {
-    let tasksView = document.getElementById('tasks-view');
-    let taskTemplateParent = document.getElementById('parent');
-    let taskTemplate = taskTemplateParent.querySelector('.task-wrapper');
-    let taskClone = taskTemplate.cloneNode(true);
-
-    let title = taskClone.querySelector('.title');
-    title.value = titleText;
-    let contents = taskClone.querySelector('.contents');
-    contents.textContent = contentsText;
-
-    taskClone.style.display = 'flex';
-    tasksView.appendChild(taskClone);
-}
 
 async function main() {
     if (userName === null || userPassword === null) {

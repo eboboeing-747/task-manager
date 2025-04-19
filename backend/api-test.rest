@@ -97,5 +97,5 @@ Content-Type: application/json
 {
     "userId": 0,
     "name": "verylongasdfasdfas;lfjad;fjasfihasdf",
-    "color": "yellow"
+    "color": "red"
 }

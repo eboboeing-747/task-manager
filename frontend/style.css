@@ -23,7 +23,7 @@ header {
     position: sticky;
     top: 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 4%;
 }
@@ -130,9 +130,9 @@ header {
     scrollbar-width: none;
 }
 
-.task-wrapper, .create-task-form-wrapper  {
+.task-wrapper, .create-unit-form-wrapper  {
     display: none; /* apply flex js */
-    border: 1px solid white;
+    border: 2px solid white;
     border-radius: 8px;
     flex-direction: column;
     padding: 10px;
@@ -168,7 +168,7 @@ header {
 
 
 /* task create form */
-.create-task-form-background {
+.create-unit-form-background {
     display: none;
     position: absolute;
     top: 0;
@@ -183,7 +183,7 @@ header {
     scrollbar-width: none;
 }
 
-.create-task-form-wrapper {
+.create-unit-form-wrapper {
     margin: 30vh;
     display: flex;
     resize: both;
@@ -196,13 +196,13 @@ header {
     resize: none;
 }
 
-.create-task-form {
+.create-unit-form {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.create-task-form-error-display {
+.create-unit-form-error-display {
     color: red;
     height: 20px;
     text-align: center;

@@ -10,9 +10,18 @@
 <body>
 
 <header>
-    <div class="focus-month" id="focus-month-display"></div>
-    <button id="locate-current-month">back to current month</button>
-    <button id="create-task">new</button>
+    <div>
+        <button id="create-status">new status</button>
+        <button id="create-task">new task</button>
+    </div>
+    <div>
+        <button id="locate-current-month" title="back to current month">
+            <div class="focus-month" id="focus-month-display"></div>
+        </button>
+    </div>
+    <div>
+        <img style="height: 40px; width: 40px; border-radius: 50%;" src="https://media1.tenor.com/m/jfJjRLN19CwAAAAd/9impulse-impulse.gif">
+    </div>
 </header>
 
 <main>
@@ -42,15 +51,30 @@
     </div>
 </main>
 
-<div class="create-task-form-background" id="create-task-form-background">
-    <div class="create-task-form-wrapper" id="create-task-form-wrapper">
-        <form class="create-task-form" id="create-task-form">
-            <div class="create-task-form-error-display" id="create-task-form-error-display"></div>
+<!-- CREATE STATUS FORM -->
+<div class="create-unit-form-background" id="create-status-form-background">
+    <div class="create-unit-form-wrapper" id="create-status-form-wrapper">
+        <form class="create-unit-form" id="create-status-form">
+            <div class="create-unit-form-error-display" id="create-status-form-error-display"></div>
+            <div class="action-bar">
+                <input type="color" id="create-status-form-color-picker">
+                <button type="submit">create</button>
+            </div>
+            <input type="text" class="title" id="create-status-form-name" required>
+        </form>
+    </div>
+</div>
+
+<!-- CREATE TASK FORM -->
+<div class="create-unit-form-background" id="create-task-form-background">
+    <div class="create-unit-form-wrapper" id="create-task-form-wrapper">
+        <form class="create-unit-form" id="create-task-form">
+            <div class="create-unit-form-error-display" id="create-task-form-error-display"></div>
             <div class="action-bar">
                 <input type="datetime-local" id="create-task-form-date" required>
                 <select id="create-task-form-status"></select>
                 <!-- <button id="cancel-form">cancel</button> -->
-                <button type="submit">save</button>
+                <button type="submit">create</button>
             </div>
             <input type="text" class="title" id="create-task-form-title" required>
             <textarea class="create-task-form-contents" id="create-task-form-contents" required></textarea>
@@ -64,8 +88,9 @@
     </div>
 </div>
 
+<!-- TASK TEMPLATE -->
 <div class="tasks-view" id="parent">
-    <div class="task-wrapper">
+    <div class="task-wrapper" id="template-task">
         <div class="action-bar">
             <div>
                 <select class="status" id="template-status"></select>
