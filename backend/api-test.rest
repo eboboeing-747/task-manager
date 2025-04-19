@@ -89,3 +89,13 @@ Content-Type: application/json
     "name": "pending",
     "color": "yellow"
 }
+
+###
+POST http://localhost:3000/statuses/create
+Content-Type: application/json
+
+{
+    "userId": 0,
+    "name": "verylongasdfasdfas;lfjad;fjasfihasdf",
+    "color": "yellow"
+}

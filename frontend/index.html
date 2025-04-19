@@ -44,16 +44,15 @@
 
 <div class="create-task-form-background" id="create-task-form-background">
     <div class="create-task-form-wrapper" id="create-task-form-wrapper">
-        <div class="create-task-form-error-display" id="create-task-form-error-display"></div>
         <form class="create-task-form" id="create-task-form">
-            <select id="create-task-form-status"></select>
-            <div class="title-bar">
-                <input type="text" class="title" id="create-task-form-title" required>
-                <div>
-                    <button id="cancel-form">cancel</button>
-                    <button type="submit">save</button>
-                </div>
+            <div class="create-task-form-error-display" id="create-task-form-error-display"></div>
+            <div class="action-bar">
+                <input type="datetime-local" id="create-task-form-date" required>
+                <select id="create-task-form-status"></select>
+                <!-- <button id="cancel-form">cancel</button> -->
+                <button type="submit">save</button>
             </div>
+            <input type="text" class="title" id="create-task-form-title" required>
             <textarea class="create-task-form-contents" id="create-task-form-contents" required></textarea>
             <div class="tag-area">
                 <div>tag1</div>
@@ -67,14 +66,17 @@
 
 <div class="tasks-view" id="parent">
     <div class="task-wrapper">
-        <select class="status" id="template-status"></select>
-        <div class="title-bar">
-            <input type="text" class="title" id="template-title">
+        <div class="action-bar">
+            <div>
+                <select class="status" id="template-status"></select>
+                <input type="datetime-local" id="template-datetime">
+            </div>    
             <div>
                 <button id="template-delete">delete</button>
                 <button id="template-save">save</button>
             </div>
         </div>
+        <input type="text" class="title" id="template-title">
         <textarea class="contents" id="template-contents"></textarea>
         <div class="tag-area">
             <div>tag1</div>

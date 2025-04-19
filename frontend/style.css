@@ -139,9 +139,10 @@ header {
     margin: 8px;
 }
 
-.title-bar {
+.action-bar {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .title {

@@ -32,6 +32,8 @@ class Task {
         this.statusSelector.id = `status-${this.id}`;
         this.addStatusOptions();
         this.statusSelector.selectedIndex = taskObject.statusId;
+        this.dateSelector = this.taskClone.querySelector('#template-datetime');
+        this.dateSelector.valueAsNumber = taskObject.deadline ? taskObject.deadline : new Date();
 
         this.taskClone.style.display = 'flex';
         tasksView.appendChild(this.taskClone);
@@ -84,13 +86,14 @@ class Task {
 
     object() {
         let status = this.statusSelector.options[this.statusSelector.selectedIndex];
+        let deadline =  this.dateSelector.valueAsNumber;
 
         return {
             'id': this.id,
             'userId': Number(userId),
             'title': this.title.value,
             'contents': this.contents.value,
-            'deadline': null, // tmp
+            'deadline': deadline,
             'tagIds': [],
             'statusId': Number(status.id)
         }
@@ -128,7 +131,7 @@ scrollRightButton.addEventListener('click', scrollRight, true);
 locateCurrentMonthButton.addEventListener('click', locateCurrentMonth, true);
 createTaskButton.addEventListener('click', displayCreateTaskForm, true);
 createTaskFormBackground.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
-cancelFormButton.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
+// cancelFormButton.addEventListener('click', (event) => { hideCreateTaskForm(event) }, true);
 
 createTaskForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -137,6 +140,7 @@ createTaskForm.addEventListener('submit', async (event) => {
 
     let newTaskTitle = document.getElementById('create-task-form-title').value;
     let newTaskContents = document.getElementById('create-task-form-contents').value;
+    let newTaskDeadline = document.getElementById('create-task-form-date').valueAsNumber;
     let newTaskStatusSelector = document.getElementById('create-task-form-status');
     let newTaskStatus = newTaskStatusSelector.options[newTaskStatusSelector.selectedIndex];
 
@@ -150,7 +154,7 @@ createTaskForm.addEventListener('submit', async (event) => {
             'userId': Number(userId),
             'title': newTaskTitle,
             'contents': newTaskContents,
-            'deadline': null,
+            'deadline': newTaskDeadline,
             'tagIds': [],
             'statusId': newTaskStatus.id
         })
@@ -181,6 +185,10 @@ function hideCreateTaskForm(event) {
 }
 
 function displayCreateTaskForm() {
+    let newTaskDeadline = document.getElementById('create-task-form-date');
+    let now = new Date();
+    let nowTruncated = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+    newTaskDeadline.valueAsNumber = nowTruncated;
     createTaskFormBackground.style.display = 'flex';
 }
 

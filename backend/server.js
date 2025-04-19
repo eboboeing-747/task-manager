@@ -39,7 +39,7 @@ class Task {
         this.userId = task.userId;
         this.title = task.title;
         this.contents = task.contents;
-        this.dateTime = new Date(task.deadline);
+        this.deadline = task.deadline;
         this.tagIds = [];
         this.statusId = task.statusId;
     }
