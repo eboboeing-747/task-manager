@@ -4,6 +4,86 @@ const userId = Number(localStorage.getItem('userId'));
 
 const tasksView = document.getElementById('tasks-view');
 
+let generalTaskList = [];
+let statusList = [];
+
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const currentDate = new Date();
+let focusYear = currentDate.getFullYear();
+let focusMonth = currentDate.getMonth();
+
+class Day {
+    static currentDayId = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()).getTime();
+    static selectedDay = null;
+
+    constructor(year, month, day, isOffset=false) {
+        this.date = new Date(year, month, day);
+        this.id = this.date.getTime();
+
+        this.cell = document.createElement('div');
+        this.cell.classList.add('day');
+        this.cell.textContent = this.date.getDate();
+
+        if (isOffset)
+            this.cell.classList.add('offset');
+
+        if (this.id == Day.currentDayId)
+            this.cell.classList.add('current');
+
+        if (Day.selectedDay != null) {
+            if (this.id == Day.selectedDay.id) {
+                this.select();
+            }
+        }
+
+        this.cell.addEventListener('click', () => { this.toggleSelection(); }, true);
+        calendarMain.appendChild(this.cell);
+    }
+
+    toggleSelection() {
+        if (Day.selectedDay === null) { // nothing is selected
+            this.select();
+            return;
+        }
+
+        if (Day.selectedDay.id === this.id) { // this is selected
+            Day.selectedDay = null;
+
+            taskView.replaceChildren();
+            for (let i = 0; i < generalTaskList.length; i++) {
+                new Task(generalTaskList[i]);
+            }
+
+            this.deselect();
+            return;
+        }
+
+        Day.selectedDay.deselect();
+        this.select();
+    }
+
+    select() {
+        Day.selectedDay = this;
+        this.cell.classList.add('selected');
+
+        let tasksOfDay = generalTaskList.filter((task) => {
+            let nextDayMs = this.date.getTime() + 86400000;
+            return (task.deadline > this.date.getTime()) && (task.deadline < nextDayMs);
+        });
+
+        tasksView.replaceChildren();
+        console.log(tasksOfDay);
+
+        for (let i = 0; i < tasksOfDay.length; i++) {
+            new Task(tasksOfDay[i]);
+        }
+    }
+
+    deselect() {
+        this.cell.classList.remove('selected');
+    }
+}
+
 class Task {
     /*
     * taskObject:
@@ -112,14 +192,6 @@ class Task {
     }
 }
 
-let taskList = [];
-let statusList = ['new', 'pending', 'complete'];
-
-const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-const currentDate = new Date();
-let focusYear = currentDate.getFullYear();
-let focusMonth = currentDate.getMonth();
-
 const calendarMain = document.getElementById('calendar-main');
 const focusMonthDisplay = document.getElementById('focus-month-display');
 const taskView = document.getElementById('tasks-view');
@@ -221,6 +293,16 @@ createTaskForm.addEventListener('submit', async (event) => {
 
 
 
+/*
+function fillTaskView(filterFunciton) {
+    let taskList = generalTaskList.filter(filterFunciton);
+
+    for (let i = 0; i < taskList; i++) {
+        new Task(taskList[i]);
+    }
+}
+*/
+
 /* resolves statusId to status object */
 function resolveStatus(statusId) {
     return statusList.find((elem) => elem.id == statusId);
@@ -253,18 +335,6 @@ function locateCurrentMonth() {
     fillCalendar(currentDate.getFullYear(), currentDate.getMonth());
 }
 
-function createDay(year, month, day, isOffset=false) {
-    let cell = document.createElement('div');
-    cell.id = `${year}${month}${day}`;
-    cell.classList.add('day');
-
-    if (isOffset)
-        cell.classList.add('offset');
-
-    cell.textContent = day;
-    calendarMain.appendChild(cell);
-}
-
 function getDaysAmount(year, month) {
     let date = new Date(year, month + 1, 0);
     return date.getDate();
@@ -290,23 +360,24 @@ function fillCalendar(year, month) {
 
     for (let i = daysInPrevMonth - getOffset(monthToFill); i < daysInPrevMonth; i++) {
         upperBorder++;
-        createDay(prevMonthYear, month, i + 1, true);
+        new Day(prevMonthYear, month, i + 1, true);
     }
 
     for (let i = 0; i < daysAmount; i++) {
         upperBorder++;
-        createDay(year, month, i + 1);
+        new Day(year, month, i + 1);
     }
 
     for (let i = 0; i + upperBorder < 42; i++) {
-        createDay(nextMonthYear, month, i + 1, true);
+        new Day(nextMonthYear, month, i + 1, true);
     }
 
+    /*
     if (year == currentDate.getFullYear() && month == currentDate.getMonth()) {
-        let currentDayId = `${currentDate.getFullYear()}${currentDate.getMonth()}${currentDate.getDate()}`;
         let currentDay = document.getElementById(currentDayId);
         currentDay.classList.add('current');
     }
+    */
 
     focusMonthDisplay.textContent = `${MONTHS[month]}, ${year}`;
 }
@@ -374,13 +445,13 @@ async function main() {
     })
 
     const taskRes = await fetch('http://localhost:3000/tasks', requestParams);
-    taskList = await taskRes.json();
+    generalTaskList = await taskRes.json();
 
     const statusRes = await fetch('http://localhost:3000/statuses', requestParams);
     statusList = await statusRes.json();
 
-    for (let i = 0; i < taskList.length; i++) {
-        new Task(taskList[i]);
+    for (let i = 0; i < generalTaskList.length; i++) {
+        new Task(generalTaskList[i]);
     }
 
     for (let i = 0; i < statusList.length; i++) {

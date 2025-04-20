@@ -110,7 +110,7 @@ header {
 }
 
 .day:hover {
-    margin: 3px;
+    margin: 2px;
     border-width: 4px;
 }
 
@@ -122,6 +122,12 @@ header {
 
 .current {
     border-color: red;
+}
+
+.selected {
+    border-color: palevioletred;
+    margin: 4px;
+    border-width: 4px;
 }
 
 .tasks-view {
