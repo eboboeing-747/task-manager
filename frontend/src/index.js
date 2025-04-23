@@ -7,7 +7,7 @@ const tasksView = document.getElementById('tasks-view');
 let generalTaskList = [];
 let statusList = [];
 
-const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const currentDate = new Date();
 let focusYear = currentDate.getFullYear();
 let focusMonth = currentDate.getMonth();
@@ -72,7 +72,6 @@ class Day {
         });
 
         tasksView.replaceChildren();
-        console.log(tasksOfDay);
 
         for (let i = 0; i < tasksOfDay.length; i++) {
             new Task(tasksOfDay[i]);
@@ -293,16 +292,6 @@ createTaskForm.addEventListener('submit', async (event) => {
 
 
 
-/*
-function fillTaskView(filterFunciton) {
-    let taskList = generalTaskList.filter(filterFunciton);
-
-    for (let i = 0; i < taskList; i++) {
-        new Task(taskList[i]);
-    }
-}
-*/
-
 /* resolves statusId to status object */
 function resolveStatus(statusId) {
     return statusList.find((elem) => elem.id == statusId);
@@ -371,13 +360,6 @@ function fillCalendar(year, month) {
     for (let i = 0; i + upperBorder < 42; i++) {
         new Day(nextMonthYear, month, i + 1, true);
     }
-
-    /*
-    if (year == currentDate.getFullYear() && month == currentDate.getMonth()) {
-        let currentDay = document.getElementById(currentDayId);
-        currentDay.classList.add('current');
-    }
-    */
 
     focusMonthDisplay.textContent = `${MONTHS[month]}, ${year}`;
 }
