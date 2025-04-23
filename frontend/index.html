@@ -71,7 +71,7 @@
         <form class="create-unit-form" id="create-task-form">
             <div class="create-unit-form-error-display" id="create-task-form-error-display"></div>
             <div class="action-bar">
-                <input type="datetime-local" id="create-task-form-date" required>
+                <input type="datetime-local" class="datetime-picker" id="create-task-form-date" required>
                 <select id="create-task-form-status"></select>
                 <!-- <button id="cancel-form">cancel</button> -->
                 <button type="submit">create</button>
@@ -79,10 +79,12 @@
             <input type="text" class="title" id="create-task-form-title" required>
             <textarea class="create-task-form-contents" id="create-task-form-contents" required></textarea>
             <div class="tag-area">
+                <!--
                 <div>tag1</div>
                 <div>tag2</div>
                 <div>tag3</div>
                 <div>tag4</div>
+                -->
             </div>
         </form>
     </div>
@@ -94,7 +96,7 @@
         <div class="action-bar">
             <div>
                 <select class="status" id="template-status"></select>
-                <input type="datetime-local" id="template-datetime">
+                <input type="datetime-local" class="datetime-picker" id="template-datetime">
             </div>    
             <div>
                 <button id="template-delete">delete</button>
@@ -104,10 +106,12 @@
         <input type="text" class="title" id="template-title">
         <textarea class="contents" id="template-contents"></textarea>
         <div class="tag-area">
+            <!--
             <div>tag1</div>
             <div>tag2</div>
             <div>tag3</div>
             <div>tag4</div>
+            -->
         </div>
     </div>
 </div>

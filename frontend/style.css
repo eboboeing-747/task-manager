@@ -4,6 +4,37 @@
     --active: grey;
 }
 
+input[type="datetime-local"] { 
+    background-color: transparent;
+    color: var(--text);
+    padding: 4px 8px;
+    border: 1px solid var(--text);
+    border-radius: 8px;
+    margin: 2px;
+}
+
+input[type="color"] {
+    color-scheme: dark;
+}
+
+select {
+    background-color: transparent;
+    color: var(--text);
+    padding: 4px 8px;
+    border: 1px solid var(--text);
+    border-radius: 8px;
+    margin: 2px;
+}
+
+option {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.datetime-picker {
+    color-scheme: dark;
+}
+
 html {
     background-color: var(--bg);
     color: var(--text);
@@ -16,7 +47,7 @@ body {
 }
 
 main {
-    height: 96%;
+    height: 95%;
 }
 
 header {
@@ -25,7 +56,16 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 4%;
+    height: 5%;
+}
+
+button {
+    background-color: transparent;
+    color: var(--text);
+    padding: 5px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--text);
+    margin: 2px;
 }
 
 .page-wrapper {
@@ -149,6 +189,7 @@ header {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .title {
