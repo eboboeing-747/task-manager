@@ -79,6 +79,10 @@ function resolveUsername(username) {
     return user;
 }
 
+app.options('', (req, res) => {
+    return res.status(200).end();
+})
+
 app.post('/register', (req, res) => {
     console.log(req.body);
 

@@ -396,6 +396,15 @@ window.addEventListener('keypress', (event) => {
 });
 
 async function main() {
+    const pingResponse = await fetch('http://localhost:3000');
+    let isOnline = pingResponse.ok;
+
+    if (!isOnline) {
+        // read indexeddb
+    } else {
+        // fetch with server
+    }
+
     if (userName === null || userPassword === null) {
         window.location.href = './auth.html';
     }
