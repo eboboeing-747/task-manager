@@ -1,3 +1,7 @@
+import * as db from './database.js';
+
+export let isOnline = false;
+
 const userName = localStorage.getItem('userName');
 const userPassword = localStorage.getItem('userPassword');
 const userId = Number(localStorage.getItem('userId'));
@@ -227,17 +231,25 @@ createStatusForm.addEventListener('submit', async (event) => {
     let newStatusName = document.getElementById('create-status-form-name');
     let newStatusColorPicker = document.getElementById('create-status-form-color-picker');
 
+    let newStatus = {
+        'userId': userId,
+        'name': newStatusName.value,
+        'color': newStatusColorPicker.value
+    }
+
+    if (!isOnline) {
+        db.addStatusDb(newStatus);
+        hideForm(null, createStatusFormWrapper, createStatusFormBackground);
+        return;
+    }
+
     let requestParams = {
         method: 'POST',
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            'userId': userId,
-            'name': newStatusName.value,
-            'color': newStatusColorPicker.value
-        })
+        body: JSON.stringify(newStatus)
     }
 
     console.log(requestParams);
@@ -339,17 +351,19 @@ function getOffset(date) {
 function fillCalendar(year, month) {
     calendarMain.replaceChildren();
     let monthToFill = new Date(year, month, 1);
-    daysAmount = new Date(monthToFill.getFullYear(), monthToFill.getMonth() + 1, 0).getDate();
+    let daysAmount = new Date(monthToFill.getFullYear(), monthToFill.getMonth() + 1, 0).getDate();
     let upperBorder = 0;
 
     let daysInPrevMonth = getDaysAmount(year, month - 1);
     
-    let prevMonthYear = month > 0 ? year : year - 1;
-    let nextMonthYear = month < 11 ? year : year + 1;
+    let prevMonthYear = month < 1 ? year - 1 : year; // (month == 0)
+    let nextMonthYear = month > 10 ? year + 1 : year; // (month == 11)
+    let prevMonth = month < 1 ? 11 : month - 1; // (month == 0)
+    let nextMonth = month > 10 ? 0 : month + 1; // (month == 11)
 
     for (let i = daysInPrevMonth - getOffset(monthToFill); i < daysInPrevMonth; i++) {
         upperBorder++;
-        new Day(prevMonthYear, month, i + 1, true);
+        new Day(prevMonthYear, prevMonth, i + 1, true);
     }
 
     for (let i = 0; i < daysAmount; i++) {
@@ -358,7 +372,7 @@ function fillCalendar(year, month) {
     }
 
     for (let i = 0; i + upperBorder < 42; i++) {
-        new Day(nextMonthYear, month, i + 1, true);
+        new Day(nextMonthYear, nextMonth, i + 1, true);
     }
 
     focusMonthDisplay.textContent = `${MONTHS[month]}, ${year}`;
@@ -395,16 +409,7 @@ window.addEventListener('keypress', (event) => {
         scrollRight();
 });
 
-async function main() {
-    const pingResponse = await fetch('http://localhost:3000');
-    let isOnline = pingResponse.ok;
-
-    if (!isOnline) {
-        // read indexeddb
-    } else {
-        // fetch with server
-    }
-
+async function checkAuth(params) {
     if (userName === null || userPassword === null) {
         window.location.href = './auth.html';
     }
@@ -430,16 +435,43 @@ async function main() {
     const authBody = await authRes.json();
     let userId = authBody.id;
     localStorage.setItem('userId', userId);
+}
 
-    requestParams.body = JSON.stringify({
-        'userId': userId
-    })
+async function getStatusListServer(params) {
+    
+}
 
-    const taskRes = await fetch('http://localhost:3000/tasks', requestParams);
-    generalTaskList = await taskRes.json();
+async function getTaskListServer(params) {
+    
+}
 
-    const statusRes = await fetch('http://localhost:3000/statuses', requestParams);
-    statusList = await statusRes.json();
+async function main() {
+    try {
+        const pingResponse = await fetch('http://localhost:3000');
+        isOnline = true;
+    } catch (error) {
+        isOnline = false;
+    }
+
+    console.log(`isOnline: ${isOnline}`); // display offline mode status
+
+    if (!isOnline) {
+        db.checkDb();
+
+        statusList = await db.getStatusListDb();
+    } else {
+        await checkAuth();
+
+        requestParams.body = JSON.stringify({
+            'userId': userId
+        })
+
+        const taskRes = await fetch('http://localhost:3000/tasks', requestParams);
+        generalTaskList = await taskRes.json();
+
+        const statusRes = await fetch('http://localhost:3000/statuses', requestParams);
+        statusList = await statusRes.json();
+    }
 
     for (let i = 0; i < generalTaskList.length; i++) {
         new Task(generalTaskList[i]);
