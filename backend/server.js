@@ -22,6 +22,7 @@ class Container {
         element.id = this.amount;
         this.contents.set(this.amount, element);
         this.amount++;
+        return element.id;
     }
 }
 
@@ -136,10 +137,12 @@ app.post('/tasks/create', (req, res) => {
     }
 
     let task = new Task(req.body);
-    tasks.add(task);
+    let newId = tasks.add(task);
     console.log(task);
 
-    return res.status(201).end();
+    return res.status(201).send({
+        'id': newId
+    });
 })
 
 app.put('/tasks/update', (req, res) => {
@@ -169,9 +172,11 @@ app.post('/statuses/create', (req, res) => {
     }
 
     let status = new Status(req.body);
-    statuses.add(status);
+    let newId = statuses.add(status);
 
-    return res.status(201).end();
+    return res.status(201).send({
+        'id': newId
+    });
 })
 
 app.post('/statuses', (req, res) => {

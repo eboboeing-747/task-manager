@@ -45,6 +45,7 @@ html {
     color: var(--text);
     padding: 10px 20px 10px 20px;
     font-size: 20px;
+    margin: 0px;
 }
 
 .auth-type-selector-button:hover {

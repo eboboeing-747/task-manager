@@ -46,10 +46,6 @@ body {
     margin-bottom: 0;
 }
 
-main {
-    height: 95%;
-}
-
 header {
     position: sticky;
     top: 0;
@@ -57,6 +53,23 @@ header {
     justify-content: space-between;
     align-items: center;
     height: 5%;
+}
+
+main {
+    height: 93%;
+}
+
+footer {
+    height: 2%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.net-status {
+    font-family: monospace;
+    display: flex;
+    color: red;
 }
 
 button {
@@ -132,7 +145,7 @@ button {
 }
 
 .calendar-main {
-    height: 96%;
+    height: 98%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;

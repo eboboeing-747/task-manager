@@ -226,8 +226,8 @@ createTaskFormBackground.addEventListener('click', (event) => { hideForm(event, 
 
 createStatusForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const errorDisplay = document.getElementById('create-task-status-error-display');
 
+    const errorDisplay = document.getElementById('create-task-status-error-display');
     let newStatusName = document.getElementById('create-status-form-name');
     let newStatusColorPicker = document.getElementById('create-status-form-color-picker');
 
@@ -237,32 +237,33 @@ createStatusForm.addEventListener('submit', async (event) => {
         'color': newStatusColorPicker.value
     }
 
-    if (!isOnline) {
-        db.addStatusDb(newStatus);
-        hideForm(null, createStatusFormWrapper, createStatusFormBackground);
-        return;
-    }
+    if (isOnline) {
+        let requestParams = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newStatus)
+        }
 
-    let requestParams = {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newStatus)
-    }
+        const res = await fetch('http://localhost:3000/statuses/create', requestParams);
 
-    console.log(requestParams);
+        if (!res.ok) {
+            errorDisplay.textContent = body.error;
+            return;
+        }
 
-    const res = await fetch('http://localhost:3000/statuses/create', requestParams);
-    
-    if (!res.ok) {
         const body = await res.json();
-        errorDisplay.textContent = body.error;
+        newStatus.id = body.id;
+    } else {
+        newStatus.id = db.getNextId(db.STATUS_TABLE_NAME);
     }
-    
+
+    console.log(newStatus);
+
+    db.addUnitDb(db.STATUS_TABLE_NAME, newStatus);
     hideForm(null, createStatusFormWrapper, createStatusFormBackground);
-    return;
 });
 
 createTaskForm.addEventListener('submit', async (event) => {
@@ -275,31 +276,42 @@ createTaskForm.addEventListener('submit', async (event) => {
     let newTaskStatusSelector = document.getElementById('create-task-form-status');
     let newTaskStatus = newTaskStatusSelector.options[newTaskStatusSelector.selectedIndex];
 
-    let requestParams = {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'userId': userId,
-            'title': newTaskTitle,
-            'contents': newTaskContents,
-            'deadline': newTaskDeadline,
-            'tagIds': [],
-            'statusId': newTaskStatus.id
-        })
+    let newTask = {
+        'userId': userId,
+        'title': newTaskTitle,
+        'contents': newTaskContents,
+        'deadline': newTaskDeadline,
+        'tagIds': [],
+        'statusId': Number(newTaskStatus.id)
     }
 
-    const res = await fetch('http://localhost:3000/tasks/create', requestParams);
-    
-    if (!res.ok) {
+    if (isOnline) {
+        let requestParams = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newTask)
+        }
+
+        const res = await fetch('http://localhost:3000/tasks/create', requestParams);
+        
+        if (!res.ok) {
+            errorDisplay.textContent = body.error;
+            return;
+        }
+
         const body = await res.json();
-        errorDisplay.textContent = body.error;
+        newTask.id = body.id;
+    } else {
+        newTask.id = db.getNextId(db.TASK_TABLE_NAME);
     }
     
+    console.log(newTask);
+
+    db.addUnitDb(db.TASK_TABLE_NAME, newTask);
     hideForm(null, createTaskFormWrapper, createTaskFormBackground);
-    return;
 })
 
 
@@ -437,30 +449,25 @@ async function checkAuth(params) {
     localStorage.setItem('userId', userId);
 }
 
-async function getStatusListServer(params) {
-    
-}
-
-async function getTaskListServer(params) {
-    
-}
-
 async function main() {
     try {
         const pingResponse = await fetch('http://localhost:3000');
         isOnline = true;
     } catch (error) {
         isOnline = false;
-    }
 
-    console.log(`isOnline: ${isOnline}`); // display offline mode status
+        let netStatus = document.getElementById("net-status");
+        netStatus.textContent = 'offline mode';
+    }
 
     if (!isOnline) {
         db.checkDb();
 
-        statusList = await db.getStatusListDb();
+        statusList = await db.getDataListDb(db.STATUS_TABLE_NAME);
+        generalTaskList = await db.getDataListDb(db.TASK_TABLE_NAME);
     } else {
         await checkAuth();
+        fetchDbServer(); // fetch all offline actions to server
 
         requestParams.body = JSON.stringify({
             'userId': userId
@@ -472,6 +479,9 @@ async function main() {
         const statusRes = await fetch('http://localhost:3000/statuses', requestParams);
         statusList = await statusRes.json();
     }
+
+    console.log(statusList);
+    console.log(generalTaskList);
 
     for (let i = 0; i < generalTaskList.length; i++) {
         new Task(generalTaskList[i]);
