@@ -162,21 +162,48 @@ class Task {
             })
         }
 
-        let res = await fetch('http://localhost:3000/tasks/delete', requestParams);
+        let res = { ok: true };
+
+        if (isOnline) {
+            try {
+                res = await fetch('http://localhost:3000/tasks/delete', requestParams);
+            } catch(error) {
+                res.ok = false;
+            }
+        }
+
+        if (res.ok) {
+            db.deleteUnitDb(db.TASK_TABLE_NAME, this.id);
+        }
+
         tasksView.removeChild(this.taskClone);
     }
 
     async save() {
+        let newTask = this.object();
+
         let requestParams = {
             method: 'PUT',
             mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(this.object())
+            body: JSON.stringify(newTask)
         }
 
-        let res = await fetch('http://localhost:3000/tasks/update', requestParams);
+        let res = { ok: true };
+
+        if (isOnline) {
+            try {
+                res = await fetch('http://localhost:3000/tasks/update', requestParams);
+            } catch(error) {
+                res.ok = false;
+            }
+        }
+
+        if (res.ok) {
+            db.updateUnitDb(db.TASK_TABLE_NAME, newTask);
+        }
     }
 
     object() {
@@ -467,7 +494,7 @@ async function main() {
         generalTaskList = await db.getDataListDb(db.TASK_TABLE_NAME);
     } else {
         await checkAuth();
-        fetchDbServer(); // fetch all offline actions to server
+        db.fetchDbServer(); // fetch all offline actions to server
 
         requestParams.body = JSON.stringify({
             'userId': userId

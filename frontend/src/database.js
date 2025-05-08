@@ -9,8 +9,22 @@ export const TASK_TABLE_NAME = "tasks";
 export let maxStatusId = null;
 export let maxTaskId = null;
 
-function fetchDbServer() {
-    // fetch all offline actions to server
+export function fetchDbServer() {
+    fetchDbServer(TASK_TABLE_NAME);
+    fetchUnitDbServer(STATUS_TABLE_NAME);
+}
+
+async function fetchUnitDbServer(tableName) {
+    let requestParams = {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    const res = await fetch(`http://localhost:3000/${tableName}/getList`, requestParams);
+    let unitList = res.json();
 }
 
 function openDb() {
@@ -85,11 +99,12 @@ export async function checkDb() {
     }
 }
 
+/*
 export function addStatusDb(status) {
     if (!isOnline) {
         status.offlineAction = "create";
     }
-    
+
     console.log(status);
 
     const db = window.indexedDB.open(db_name, db_version);
@@ -105,6 +120,7 @@ export function addStatusDb(status) {
         request.onerror = () => { console.log(`failed to add status`); };
     }
 }
+*/
 
 export function addUnitDb(tableName, unit) {
     unit.offlineAction = isOnline ? 'null' : 'create';
@@ -153,5 +169,75 @@ export function getDataListDb(tableName) {
         };
 
         request.onerror = () => reject(request.error);
+    })
+}
+
+export function deleteUnitDb(tableName, id) {
+    return new Promise( async (resolve, reject) => {
+        const db = await openDb();
+        const transaction = db.transaction(tableName, "readwrite");
+        const store = transaction.objectStore(tableName);
+        const request = store.openCursor();
+    
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+
+            if (!cursor) {
+                resolve(false);
+                return;
+            }
+
+            if (cursor.value.id === id) {
+                store.delete(cursor.value.dbid);
+                resolve(true);
+                return;
+            }
+
+            cursor.continue();
+        }
+
+        request.onerror = (event) => {
+            reject();
+        }
+    })
+}
+
+export function updateUnitDb(tableName, unit) {
+    return new Promise( async (resolve, reject) => {
+        const db = await openDb();
+        const transaction = db.transaction(tableName, "readwrite");
+        const store = transaction.objectStore(tableName);
+        const request = store.openCursor();
+    
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+
+            if (!cursor) {
+                resolve(false);
+                return;
+            }
+
+            if (cursor.value.id === unit.id) {
+                const updateUnit = cursor.value;
+                unit.id = updateUnit.id;
+                unit.dbid = updateUnit.dbid;
+                unit.userId = updateUnit.userId;
+                unit.offlineAction = 'update';
+
+                const updateReq = cursor.update(unit);
+
+                updateReq.onerror = () => {console.log('failed to update')}
+                updateReq.onsuccess = () => {console.log('updated')}
+
+                resolve(true);
+                return;
+            }
+
+            cursor.continue();
+        }
+
+        request.onerror = (event) => {
+            reject();
+        }
     })
 }
