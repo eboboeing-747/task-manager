@@ -1,30 +1,189 @@
-import { isOnline } from './index.js';
+import { isOnline, userId } from './index.js';
 
-const db_name = "task-manager";
+const db_name = 'task-manager';
 const db_version = 1;
 export const maxIds = {};
-export const STATUS_TABLE_NAME = "statuses";
-export const TASK_TABLE_NAME = "tasks";
+export const STATUS_TABLE_NAME = 'statuses';
+export const TASK_TABLE_NAME = 'tasks';
+const CREATE_ACTION = 'create';
+const UPDATE_ACTION = 'update';
+const NULL_ACTION = 'null';
 
 export let maxStatusId = null;
 export let maxTaskId = null;
 
-export function fetchDbServer() {
-    fetchDbServer(TASK_TABLE_NAME);
-    fetchUnitDbServer(STATUS_TABLE_NAME);
+function cloneUnit(unitToCopy) {
+    const excludeProps = ['offlineAction', 'dbid'];
+    let unitClone = {};
+    let keys = Object.keys(unitToCopy);
+
+    for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+
+        if (excludeProps.includes(key)) {
+            continue;
+        }
+
+        unitClone[key] = unitToCopy[key];
+    }
+
+    return unitClone;
 }
 
-async function fetchUnitDbServer(tableName) {
+/*
+export async function fetchUnitTypeDbServer(tableName, unitList) {
     let requestParams = {
-        method: 'GET',
+        method: 'POST',
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: null
     }
 
-    const res = await fetch(`http://localhost:3000/${tableName}/getList`, requestParams);
-    let unitList = res.json();
+    for (let i = 0; i < unitList.length; i++) {
+        let unit = unitList[i];
+
+        if (unit.offlineAction === NULL_ACTION) {
+            continue;
+        }
+
+        let res;
+
+        if (unit.offlineAction === CREATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(unit));
+            res = await fetch(`http://localhost:3000/${tableName}/create`, requestParams);
+        } else if (unit.offlineAction === UPDATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(unit));
+            res = await fetch(`http://localhost:3000/${tableName}/update`, requestParams);
+        }
+
+        // UPDATE statusId in task
+
+        let body = await res.json();
+        let db = await openDb();
+        const objectStore = db
+            .transaction(tableName, "readwrite")
+            .objectStore(tableName);
+
+        unit.id = body.id;
+        unit.offlineAction = NULL_ACTION;
+        objectStore.put(unit);
+    }
+}
+*/
+
+export async function fetchStatusesDbServer(statusList) {
+    let requestParams = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: null
+    }
+
+    let statusIdMutations = {};
+
+    for (let i = 0; i < statusList.length; i++) {
+        let status = statusList[i];
+
+        if (status.offlineAction === NULL_ACTION) {
+            continue;
+        }
+
+        let res;
+
+        if (status.offlineAction === CREATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(status));
+            res = await fetch(`http://localhost:3000/statuses/create`, requestParams);
+        } else if (status.offlineAction === UPDATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(status));
+            res = await fetch(`http://localhost:3000/statuses/update`, requestParams);
+        }
+
+        let body = await res.json();
+        let db = await openDb();
+        const statusesDb = db
+            .transaction(STATUS_TABLE_NAME, "readwrite")
+            .objectStore(STATUS_TABLE_NAME);
+
+        statusIdMutations[status.id] = body.id;
+        status.id = body.id;
+        status.offlineAction = NULL_ACTION;
+        statusesDb.put(status);
+    }
+
+    return statusIdMutations;
+}
+
+export async function fetchTasksDbServer(taskList, statusIdMutations) {
+    let requestParams = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: null
+    }
+
+    for (let i = 0; i < taskList.length; i++) {
+        let task = taskList[i];
+        task.statusId = statusIdMutations[task.statusId];
+
+        if (task.offlineAction === NULL_ACTION) {
+            continue;
+        }
+
+        if (task.offlineAction === CREATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(task));
+            let res = await fetch(`http://localhost:3000/tasks/create`, requestParams);
+            let body = await res.json();
+            task.id = body.id;
+        } else if (task.offlineAction === UPDATE_ACTION) {
+            requestParams.body = JSON.stringify(cloneUnit(task));
+            await fetch(`http://localhost:3000/tasks/update`, requestParams);
+        }
+
+        let db = await openDb();
+        const tasksDb = db
+            .transaction(TASK_TABLE_NAME, "readwrite")
+            .objectStore(TASK_TABLE_NAME);
+
+        task.offlineAction = NULL_ACTION;
+        tasksDb.put(task);
+    }
+}
+
+function getTaskListFromStatusId(statusId) {
+    return new Promise( async (resolve, reject) => {
+        const db = await openDb();
+        const transaction = db.transaction(TASK_TABLE_NAME, "readwrite");
+        const store = transaction.objectStore(TASK_TABLE_NAME);
+        const request = store.openCursor();
+        const tasks = [];
+
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+
+            if (!cursor) {
+                resolve(false);
+                return;
+            }
+
+            if (cursor.value.statusId === statusId && cursor.value.offlineAction !== NULL_ACTION) {
+                tasks.push(cursor.value);
+            }
+
+            cursor.continue();
+        }
+
+        request.onerror = (event) => {
+            reject();
+        }
+
+        resolve(tasks);
+    })
 }
 
 function openDb() {
@@ -35,36 +194,6 @@ function openDb() {
         request.onerror = () => reject(request.error);
     });
 }
-
-/*
-async function getMaxId(tableName) {
-    const db = await openDb();
-
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(tableName, "readonly");
-        const store = transaction.objectStore(tableName);
-        const request = store.openCursor();
-
-        let maxId = null;
-
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-
-            if (!cursor) {
-                resolve(maxId);
-            }
-
-            const record = cursor.value;
-            if (record.id != null && (maxId == null || record.id > maxId)) {
-                maxId = record.id;
-            }
-            cursor.continue();
-        };
-
-        request.onerror = () => reject(request.error);
-    });
-}
-*/
 
 export async function checkDb() {
     const db = window.indexedDB.open(db_name, db_version);
@@ -99,31 +228,8 @@ export async function checkDb() {
     }
 }
 
-/*
-export function addStatusDb(status) {
-    if (!isOnline) {
-        status.offlineAction = "create";
-    }
-
-    console.log(status);
-
-    const db = window.indexedDB.open(db_name, db_version);
-
-    db.onsuccess = (event) => {
-        const innerdb = event.target.result;
-
-        const transaction = innerdb.transaction(STATUS_TABLE_NAME, "readwrite");
-        const store = transaction.objectStore(STATUS_TABLE_NAME);
-        const request = store.add(status);
-
-        request.onsuccess = () => { console.log(`added status: ${status}`); };
-        request.onerror = () => { console.log(`failed to add status`); };
-    }
-}
-*/
-
 export function addUnitDb(tableName, unit) {
-    unit.offlineAction = isOnline ? 'null' : 'create';
+    unit.offlineAction = isOnline ?  NULL_ACTION : CREATE_ACTION;
 
     const db = window.indexedDB.open(db_name, db_version);
 
@@ -208,7 +314,7 @@ export function updateUnitDb(tableName, unit) {
         const transaction = db.transaction(tableName, "readwrite");
         const store = transaction.objectStore(tableName);
         const request = store.openCursor();
-    
+
         request.onsuccess = (event) => {
             const cursor = event.target.result;
 
@@ -222,7 +328,7 @@ export function updateUnitDb(tableName, unit) {
                 unit.id = updateUnit.id;
                 unit.dbid = updateUnit.dbid;
                 unit.userId = updateUnit.userId;
-                unit.offlineAction = 'update';
+                unit.offlineAction = updateUnit.offlineAction === NULL_ACTION ? UPDATE_ACTION : updateUnit.offlineAction;
 
                 const updateReq = cursor.update(unit);
 

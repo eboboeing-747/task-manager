@@ -1,10 +1,9 @@
 import * as db from './database.js';
 
 export let isOnline = false;
-
-const userName = localStorage.getItem('userName');
-const userPassword = localStorage.getItem('userPassword');
-const userId = Number(localStorage.getItem('userId'));
+export const userName = localStorage.getItem('userName');
+export const userPassword = localStorage.getItem('userPassword');
+export const userId = Number(localStorage.getItem('userId'));
 
 const tasksView = document.getElementById('tasks-view');
 
@@ -478,7 +477,7 @@ async function checkAuth(params) {
 
 async function main() {
     try {
-        const pingResponse = await fetch('http://localhost:3000');
+        const pingResponse = await fetch('http://localhost:3000/', { method: 'OPTIONS' });
         isOnline = true;
     } catch (error) {
         isOnline = false;
@@ -487,14 +486,27 @@ async function main() {
         netStatus.textContent = 'offline mode';
     }
 
-    if (!isOnline) {
-        db.checkDb();
+    db.checkDb();
 
-        statusList = await db.getDataListDb(db.STATUS_TABLE_NAME);
-        generalTaskList = await db.getDataListDb(db.TASK_TABLE_NAME);
-    } else {
+    statusList = await db.getDataListDb(db.STATUS_TABLE_NAME);
+    generalTaskList = await db.getDataListDb(db.TASK_TABLE_NAME);
+
+    if (isOnline) {
         await checkAuth();
-        db.fetchDbServer(); // fetch all offline actions to server
+        console.log('performing server sync');
+        // await db.fetchUnitTypeDbServer(db.STATUS_TABLE_NAME, statusList);
+        let statusIdMutations = await db.fetchStatusesDbServer(statusList);
+        await db.fetchTasksDbServer(generalTaskList, statusIdMutations);
+        console.log('server sync complite: ', statusIdMutations);
+
+        const requestParams = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: null
+        }
 
         requestParams.body = JSON.stringify({
             'userId': userId

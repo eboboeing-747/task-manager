@@ -22,6 +22,9 @@ class Container {
         element.id = this.amount;
         this.contents.set(this.amount, element);
         this.amount++;
+
+        console.log(element, '\n');
+
         return element.id;
     }
 }
@@ -80,7 +83,7 @@ function resolveUsername(username) {
     return user;
 }
 
-app.options('', (req, res) => {
+app.options('/', (req, res) => {
     return res.status(200).end();
 })
 
@@ -131,14 +134,28 @@ app.post('/tasks', (req, res) => {
     return res.status(200).send(taskList);
 })
 
+app.post('/tasks/idList', (req, res) => {
+    let userId = req.body.userId;
+    let taskIdList = [];
+
+    tasks.contents.forEach(function(value, key) {
+        if (value.userId == userId) {
+            taskIdList.push(value);
+        }
+    })
+
+    return res.status(200).send(taskIdList);
+})
+
 app.post('/tasks/create', (req, res) => {
+    console.log('CREATING NEW TASK:\n');
+
     if (!users.contents.has(req.body.userId)) {
         return res.status(404).send({'error': 'no user with such id'});
     }
 
     let task = new Task(req.body);
     let newId = tasks.add(task);
-    console.log(task);
 
     return res.status(201).send({
         'id': newId
@@ -146,6 +163,9 @@ app.post('/tasks/create', (req, res) => {
 })
 
 app.put('/tasks/update', (req, res) => {
+    console.log('UPDATING NEW TASK:\n');
+    console.log(req.body, '\n');
+
     let id = req.body.id;
     if (!tasks.contents.has(id)) {
         return res.status(404).send({'error': 'no task with such id'});
@@ -167,8 +187,10 @@ app.delete('/tasks/delete', (req, res) => {
 })
 
 app.post('/statuses/create', (req, res) => {
+    console.log('CREATING NEW STATUS:\n');
+
     if (!users.contents.has(req.body.userId)) {
-        return res.status(404).send({'error': 'no user with such id'});
+        return res.status(404).send({'error': `no user with such id: ${req.body.userId}`});
     }
 
     let status = new Status(req.body);
@@ -190,6 +212,19 @@ app.post('/statuses', (req, res) => {
     })
 
     return res.status(200).send(statusList);
+})
+
+app.post('/statuses/idList', (req, res) => {
+    let userId = req.body.userId;
+    let statusIdList = [];
+
+    statuses.contents.forEach(function(value, key) {
+        if (value.userId == userId) {
+            statusIdList.push(value);
+        }
+    })
+
+    return res.status(200).send(statusIdList);
 })
 
 app.post('tags/create', (req, res) => {
