@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+    res.header("Access-Control-Allow-Origin", `http://localhost:${process.env.SERVER_PORT}`);
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "*");
     next();
@@ -251,4 +251,4 @@ app.post('tags', (req, res) => {
     return res.status(200).send(tagList);
 })
 
-app.listen(process.env.PORT);
+app.listen(process.env.SERVER_PORT);
